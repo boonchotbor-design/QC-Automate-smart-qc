@@ -45,12 +45,21 @@
 .auth-card input {
   background: var(--bg);
   border: 1px solid var(--border2);
-  padding: 14px;
+  padding: 14px 16px;
   border-radius: var(--radius);
   color: #fff;
-  text-align: center;
-  font-size: 18px;
-  letter-spacing: 0.2em;
+  text-align: left;
+  font-size: 15px;
+  letter-spacing: normal;
+  transition: all 0.2s;
+  width: 100%;
+}
+
+.auth-card input:focus {
+  border-color: var(--accent);
+  background: var(--bg2);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.1);
 }
 
 .error-text { color: var(--red); font-size: 13px; margin-top: 15px; }
@@ -497,8 +506,14 @@ td { padding: 12px; font-size: 14px; border-bottom: 1px solid var(--border); }
   font-size: 15px;
 }
 
+.auth-card .btn-primary {
+  width: 100%;
+  margin-top: 5px;
+  padding: 14px;
+}
+
 .auth-footer {
-  margin-top: 20px;
+  margin-top: 15px;
   display: flex;
   justify-content: center;
   gap: 20px;
@@ -548,8 +563,16 @@ td { padding: 12px; font-size: 14px; border-bottom: 1px solid var(--border); }
 .input-icon {
   position: absolute;
   left: 15px;
-  color: var(--text3);
+  color: var(--accent);
+  opacity: 0.7;
   pointer-events: none;
+  transition: all 0.2s;
+}
+
+.input-wrapper:focus-within .input-icon,
+.password-wrapper:focus-within .input-icon {
+  opacity: 1;
+  transform: scale(1.1);
 }
 
 .toggle-password {

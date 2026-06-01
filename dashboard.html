@@ -26,7 +26,12 @@
       <p>กรุณากรอกอีเมลและรหัสผ่านเพื่อเข้าใช้งาน</p>
       <div class="input-group-stack">
         <input type="email" id="admin-email" placeholder="อีเมล (@teloneer.com)" />
-        <input type="password" id="admin-password" placeholder="รหัสผ่าน" />
+        <div class="password-wrapper">
+          <input type="password" id="admin-password" placeholder="รหัสผ่าน" />
+          <button type="button" class="toggle-password" onclick="togglePassword('admin-password')">
+            <svg class="eye-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+          </button>
+        </div>
         <button class="btn-primary" onclick="checkAuth()">เข้าสู่ระบบ</button>
       </div>
       <div class="auth-footer">
@@ -62,8 +67,18 @@
       <p>กรอกรหัส OTP 6 หลักที่ได้รับในอีเมล</p>
       <div class="input-group-stack">
         <input type="text" id="otp-code" placeholder="รหัส OTP (6 หลัก)" maxlength="6" />
-        <input type="password" id="new-password" placeholder="รหัสผ่านใหม่" />
-        <input type="password" id="confirm-password" placeholder="ยืนยันรหัสผ่านใหม่" />
+        <div class="password-wrapper">
+          <input type="password" id="new-password" placeholder="รหัสผ่านใหม่" />
+          <button type="button" class="toggle-password" onclick="togglePassword('new-password')">
+            <svg class="eye-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+          </button>
+        </div>
+        <div class="password-wrapper">
+          <input type="password" id="confirm-password" placeholder="ยืนยันรหัสผ่านใหม่" />
+          <button type="button" class="toggle-password" onclick="togglePassword('confirm-password')">
+            <svg class="eye-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+          </button>
+        </div>
         <button class="btn-primary" onclick="resetPassword()">เปลี่ยนรหัสผ่านและเข้าสู่ระบบ</button>
       </div>
       <div class="auth-footer">

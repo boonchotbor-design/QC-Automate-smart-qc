@@ -528,4 +528,87 @@ td { padding: 12px; font-size: 14px; border-bottom: 1px solid var(--border); }
   letter-spacing: 10px;
   padding-left: 24px;
 }
-$css
+
+/* Password Visibility Toggle */
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-wrapper input {
+  width: 100%;
+  padding-right: 45px !important;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  color: var(--text3);
+  cursor: pointer;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.toggle-password:hover {
+  color: var(--accent);
+}
+
+.eye-icon {
+  display: block;
+}
+
+/* User Info & Logout */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-left: 20px;
+  border-left: 1px solid var(--border);
+  height: 32px;
+}
+
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  background: var(--green);
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--green);
+}
+
+#user-email {
+  font-size: 13px;
+  color: var(--text2);
+  font-family: var(--font-mono);
+}
+
+.logout-btn {
+  background: transparent;
+  border: 1px solid var(--border2);
+  color: var(--text3);
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  padding: 0;
+}
+
+.logout-btn:hover {
+  background: rgba(255, 61, 90, 0.1);
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.logout-btn svg {
+  display: block;
+}
+

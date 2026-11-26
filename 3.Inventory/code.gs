@@ -81,10 +81,17 @@ function doGet(e) {
       .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
   }
 
-  return HtmlService.createTemplateFromFile('app').evaluate()
-    .setTitle('Inventory Smart App V.7.6.0')
-    .addMetaTag('viewport', 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0')
-    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+  try {
+    return HtmlService.createTemplateFromFile('preview_nextgen_smartstock').evaluate()
+      .setTitle('SmartStock Pro v8.0 PRO')
+      .addMetaTag('viewport', 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0')
+      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+  } catch (err) {
+    return HtmlService.createTemplateFromFile('app').evaluate()
+      .setTitle('Inventory Smart App V.7.6.0')
+      .addMetaTag('viewport', 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0')
+      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+  }
 }
 
 function doPost(e) {

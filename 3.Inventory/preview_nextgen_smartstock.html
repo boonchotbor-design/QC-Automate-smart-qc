@@ -1,13 +1,13 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="th" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SmartStock Pro — Telecom Asset & Inventory Cloud</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://unpkg.com/html5-qrcode"></script>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Sarabun:wght@300;400;500;600;700&display=swap');
     
@@ -531,7 +531,7 @@
             <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Connected
           </span>
         </div>
-        <button onclick="showToast('Cloud Data Synchronized with Google Sheets & Apps Script!', 'success')" class="w-full py-1.5 px-3 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-md text-xs font-medium border border-slate-700 flex items-center justify-center gap-1.5 transition-all-fast">
+        <button onclick="syncLiveGAS()" class="w-full py-1.5 px-3 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-md text-xs font-medium border border-slate-700 flex items-center justify-center gap-1.5 transition-all-fast">
           <span>🔄</span> Sync Data Now
         </button>
       </div>
@@ -666,9 +666,10 @@
               
               <!-- Customer Filter -->
               <select id="filter-customer" onchange="applyFilters()" class="bg-slate-900/90 text-xs text-slate-200 border border-slate-700/80 rounded-xl px-3 py-2 focus:outline-none focus:border-indigo-500">
-                <option value="ALL">Network: All (AIS + TRUE)</option>
+                <option value="ALL">Network: All (AIS + TRUE + NT)</option>
                 <option value="AIS">AIS Only</option>
                 <option value="TRUE">TRUE Only</option>
+                <option value="NT">NT Only</option>
               </select>
 
               <!-- Region Filter -->
@@ -680,6 +681,11 @@
                 <option value="NR">NR (Northern)</option>
                 <option value="SR">SR (Southern)</option>
                 <option value="NER">NER (North Eastern)</option>
+                <option value="CR">CR (Central)</option>
+                <option value="HAE">HAE (Hatyai East)</option>
+                <option value="HAN">HAN (Hatyai North)</option>
+                <option value="HSO">HSO (Hatyai South)</option>
+                <option value="HSW">HSW (Hatyai South-West)</option>
               </select>
 
               <!-- Type Filter -->
@@ -7958,22 +7964,64 @@ let BOM_TRUE = [
 
     function fetchBOMFromSheet() {
       const btn = document.getElementById('btn-fetch-bom');
-      if (btn) btn.innerHTML = '<span>⏳</span> กำลังโหลด...';
-      setTimeout(() => {
-        if (btn) btn.innerHTML = '<span>📥</span> <span data-i18n="btn_fetch_bom">โหลดข้อมูล (Fetch)</span>';
-        const bom = curBomCustomer === 'TRUE' ? BOM_TRUE : BOM_AIS;
-        showToast('✅ โหลดข้อมูล BOM ' + curBomCustomer + ' ล่าสุดเรียบร้อย (' + bom.length + ' รายการ)', 'success');
-        bomFilterAndRender();
-      }, 600);
+      if (btn) { btn.disabled = true; btn.innerHTML = '<span>⏳</span> กำลังโหลด...'; }
+      if (!_isGAS) {
+        setTimeout(() => {
+          if (btn) { btn.disabled = false; btn.innerHTML = '<span>📥</span> <span data-i18n="btn_fetch_bom">โหลดข้อมูล (Fetch)</span>'; }
+          const bom = curBomCustomer === 'TRUE' ? BOM_TRUE : BOM_AIS;
+          showToast('✅ โหลดข้อมูล BOM ' + curBomCustomer + ' (Demo) เรียบร้อย (' + bom.length + ' รายการ)', 'success');
+          bomFilterAndRender();
+        }, 500);
+        return;
+      }
+      google.script.run
+        .withSuccessHandler(function(data) {
+          if (btn) { btn.disabled = false; btn.innerHTML = '<span>📥</span> <span data-i18n="btn_fetch_bom">โหลดข้อมูล (Fetch)</span>'; }
+          if (data && Array.isArray(data)) {
+            if (curBomCustomer === 'TRUE') {
+              BOM_TRUE = data;
+            } else {
+              BOM_AIS = data;
+            }
+            bomPage = 0;
+            bomFilterAndRender();
+            showToast('✅ โหลดข้อมูล BOM ' + curBomCustomer + ' สำเร็จ (' + data.length + ' รายการ)', 'success');
+          } else {
+            showToast('⚠️ ไม่พบข้อมูล BOM ' + curBomCustomer, 'warning');
+          }
+        })
+        .withFailureHandler(function(err) {
+          if (btn) { btn.disabled = false; btn.innerHTML = '<span>📥</span> <span data-i18n="btn_fetch_bom">โหลดข้อมูล (Fetch)</span>'; }
+          showToast('❌ โหลดข้อมูล BOM ล้มเหลว: ' + (err && err.message ? err.message : err), 'error');
+        })
+        .getBOMData(curBomCustomer);
     }
 
     function syncBOMToSheet() {
       const btn = document.getElementById('btn-sync-bom');
-      if (btn) btn.innerHTML = '<span>⏳</span> Syncing...';
-      setTimeout(() => {
-        if (btn) btn.innerHTML = '<span>🔄</span> <span data-i18n="btn_sync_bom">Sync To Sheet</span>';
-        showToast('✅ Sync BOM ' + curBomCustomer + ' ลง Google Sheet สำเร็จ!', 'success');
-      }, 700);
+      if (btn) { btn.disabled = true; btn.innerHTML = '<span>⏳</span> Syncing...'; }
+      const bomData = curBomCustomer === 'TRUE' ? BOM_TRUE : BOM_AIS;
+      if (!_isGAS) {
+        setTimeout(() => {
+          if (btn) { btn.disabled = false; btn.innerHTML = '<span>🔄</span> <span data-i18n="btn_sync_bom">Sync To Sheet</span>'; }
+          showToast('✅ Sync BOM ' + curBomCustomer + ' สำเร็จ (Demo Mode)', 'success');
+        }, 600);
+        return;
+      }
+      google.script.run
+        .withSuccessHandler(function(res) {
+          if (btn) { btn.disabled = false; btn.innerHTML = '<span>🔄</span> <span data-i18n="btn_sync_bom">Sync To Sheet</span>'; }
+          if (res && res.success === false) {
+            showToast('❌ Sync BOM ล้มเหลว: ' + (res.error || 'Unknown error'), 'error');
+          } else {
+            showToast('✅ Sync BOM ' + curBomCustomer + ' ลง Google Sheet สำเร็จ (' + bomData.length + ' รายการ)', 'success');
+          }
+        })
+        .withFailureHandler(function(err) {
+          if (btn) { btn.disabled = false; btn.innerHTML = '<span>🔄</span> <span data-i18n="btn_sync_bom">Sync To Sheet</span>'; }
+          showToast('❌ Sync BOM ล้มเหลว: ' + (err && err.message ? err.message : err), 'error');
+        })
+        .saveBOMData(curBomCustomer, bomData);
     }
 
     // ── GAS Environment Detection
@@ -10314,7 +10362,7 @@ function safeSetItem(k,v){ try{localStorage.setItem(k,v);}catch(e){} }
 function safeRemoveItem(k){ try{localStorage.removeItem(k);}catch(e){} }
 
 function getLocalUsers(){ if(_usersCache) return _usersCache; try{return JSON.parse(safeGetItem('inv_users')||'{}');}catch(e){return{};} }
-function saveLocalUsers(u){ _usersCache=u; safeSetItem('inv_users',JSON.stringify(u)); if(_isGAS){try{google.script.run.saveUsersDB(JSON.stringify(u));}catch(e){}} }
+function saveLocalUsers(u){ _usersCache=u; safeSetItem('inv_users',JSON.stringify(u)); if(_isGAS){try{google.script.run.withFailureHandler(function(e){console.warn('saveUsersDB failed:',e&&e.message);}).saveUsersDB(JSON.stringify(u));}catch(e){console.warn('saveUsersDB error:',e);}} }
 
 function updateSidebarUser(name, email) {
   const nameEl = document.getElementById('sb-user-name');
@@ -10502,6 +10550,7 @@ async function doRegister(){
 function logoutUser(){
   const who = currentUserName || currentUserEmail || 'ผู้ใช้งาน';
   if(!confirm('ยืนยันออกจากระบบ (' + who + ') ใช่หรือไม่?')) return;
+  stopAutoSync();
   safeRemoveItem('inv_user_email');
   safeRemoveItem('inv_user_name');
   currentUserEmail = '';
@@ -10514,12 +10563,24 @@ function logoutUser(){
   showToast('🔒 ออกจากระบบเรียบร้อยแล้ว', 'info');
 }
 
+var _autoSyncInterval = null;
+function startAutoSync() {
+  if (_autoSyncInterval) clearInterval(_autoSyncInterval);
+  _autoSyncInterval = setInterval(syncLiveGAS, 5 * 60 * 1000);
+}
+function stopAutoSync() {
+  if (_autoSyncInterval) {
+    clearInterval(_autoSyncInterval);
+    _autoSyncInterval = null;
+  }
+}
+
 function initAfterLogin(){
   _isGAS = checkIsGAS();
   updateTransactionDraftChip();
   syncLiveGAS();
   syncBOMFromGAS();
-  setInterval(syncLiveGAS, 5 * 60 * 1000);
+  startAutoSync();
 }
 
 function initSmartStock(){
